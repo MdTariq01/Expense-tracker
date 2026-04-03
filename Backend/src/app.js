@@ -25,4 +25,7 @@ app.use(cookieParser())
 
 app.use(helmet())
 
+app.use("/api/auth", authRoutes)
+app.use("/api/expenses", expenseRoutes)
+
 export { app };
