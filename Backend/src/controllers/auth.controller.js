@@ -253,10 +253,17 @@ export const updatePassword = asyncHandler(async (req, res) => {
         throw new ApiError(401, "Invalid current password")
     }
 
-    user.password = newPassword
+    if (newPassword) {
+        user.password = newPassword
+    }
+
+    if (req.body.twoFactorEnabled !== undefined) {
+        user.twoFactorEnabled = !!req.body.twoFactorEnabled
+    }
+
     await user.save()
 
     return res
         .status(200)
-        .json(new ApiResponse(200, null, "Password updated successfully"))
+        .json(new ApiResponse(200, user, "Security settings updated successfully"))
 })

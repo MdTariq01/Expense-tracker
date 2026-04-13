@@ -12,6 +12,7 @@ import Expenses from './pages/Expenses';
 import AddExpense from './pages/AddExpense';
 import Insights from './pages/Insights';
 import Profile from './pages/Profile';
+import Membership from './pages/Membership';
 import Landing from './pages/Landing';
 
 // ── Protected layout wrapper (sidebar + navbar) ──────────────────────────────
@@ -79,6 +80,7 @@ function App() {
             <Route path="/add-expense" element={<AddExpense />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/upgrade" element={<Membership />} />
             <Route path="/settings" element={<Profile />} />
           </Route>
 
