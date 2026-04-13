@@ -4,6 +4,7 @@ import { ApiError } from "../utils/ApiError.js"
 import { asyncHandler } from "../utils/AsyncHandler.js"
 
 export const verifyJWT = asyncHandler(async (req, res, next) => {
+    // Look for token in headers
     const token = req.headers.authorization?.replace("Bearer ", "")
 
     if (!token) {
@@ -12,9 +13,10 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     let decoded
     try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET)
+        // Updated to use the user's preferred ACCESS_TOKEN_CODE
+        decoded = jwt.verify(token, process.env.ACCESS_TOKEN_CODE)
     } catch (err) {
-        throw new ApiError(401, "Invalid or expired token")
+        throw new ApiError(401, "Invalid or expired access token")
     }
 
     const user = await User.findById(decoded._id).select("-password")

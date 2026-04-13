@@ -14,7 +14,21 @@ app.use(helmet())
 
 app.use(
     cors({
-        origin: process.env.CORS_ORIGIN,
+        origin: (origin, callback) => {
+            const allowed = process.env.CORS_ORIGIN === "*" 
+                ? true 
+                : process.env.CORS_ORIGIN?.split(",") || []
+            
+            if (process.env.NODE_ENV === "development") {
+                console.log(`[CORS] Request from origin: ${origin}`);
+            }
+
+            if (allowed === true || (origin && allowed.includes(origin)) || !origin) {
+                callback(null, true)
+            } else {
+                callback(new Error("CORS: Origin not allowed"))
+            }
+        },
         credentials: true,
     })
 )

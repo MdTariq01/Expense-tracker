@@ -33,7 +33,7 @@ export const getSpendInsights = asyncHandler(async (req, res) => {
         return res.status(200).json(
             new ApiResponse(
                 200,
-                { insights: "No expenses found in the last 90 days. Start adding expenses to get AI insights!" },
+                { narrative: "No expenses found in the last 90 days. Start adding expenses to get AI insights!", items: [] },
                 "No data to analyze"
             )
         )
@@ -46,32 +46,79 @@ export const getSpendInsights = asyncHandler(async (req, res) => {
         return acc
     }, {})
 
+    const userCurrency = req.user?.currency || "USD"
     const expenseList = expenses
         .slice(0, 30) // cap to 30 items to stay within token limits
-        .map((e) => `- ${e.title} | ₹${e.amount} | ${e.category} | ${new Date(e.date).toDateString()}`)
+        .map((e) => `- ${e.title} | ${userCurrency} ${e.amount} | ${e.category} | ${new Date(e.date).toDateString()}`)
         .join("\n")
 
     const prompt = `
-You are a personal finance assistant. Analyze the following expense data for the last 90 days and give the user:
-1. A brief summary of their spending habits (2-3 sentences)
-2. Top 2-3 insights or patterns you notice
-3. 2-3 actionable suggestions to save money or spend more wisely
+SYSTEM: You are a financial expert AI. Return ONLY a valid JSON object. No narrative outside the JSON.
+Today's date is ${new Date().toDateString()}.
 
-User's total spend: ₹${totalSpend.toFixed(2)}
+User's total spend (last 90 days): ${userCurrency} ${totalSpend.toFixed(2)}
 Spending by category: ${JSON.stringify(byCategory, null, 2)}
 
-Recent expenses:
+Recent transactions:
 ${expenseList}
 
-Keep the tone friendly, concise, and motivating. Format the response in clear sections.
+RETURN THIS JSON STRUCTURE:
+{
+  "narrative": "A 2-3 sentence overview of the financial health.",
+  "projectedSurplus": <number>,
+  "burnRisk": "Low" | "Moderate" | "Urgent",
+  "burnRiskDetail": "One sentence explaining the risk level.",
+  "lifestyleBalance": {
+     "essential": <number, 0-100>,
+     "discretionary": <number, 0-100>
+  },
+  "items": [
+    {
+      "icon": "Material Symbol name (e.g. 'trending_down', 'savings', 'warning')",
+      "title": "Short title",
+      "description": "One sentence tip",
+      "urgency": "low" | "medium" | "high"
+    }
+  ]
+}
 `.trim()
 
     const model = getGemini()
-    const result = await model.generateContent(prompt)
-    const insights = result.response.text()
+    
+    let structured
+    try {
+        const result = await model.generateContent(prompt)
+        const raw = result.response.text().trim()
+        
+        // ROBUST EXTRACTION: Use regex to find the first { and last }
+        const jsonMatch = raw.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+            throw new Error("No JSON found in AI response")
+        }
+        
+        structured = JSON.parse(jsonMatch[0])
+    } catch (error) {
+        console.error("GEMINI_INSIGHT_ERROR:", error.message)
+        // Fallback if AI fails or returns invalid JSON
+        structured = {
+            narrative: "The AI engine is currently refining your analysis. Please try again in a few minutes.",
+            items: [
+                {
+                    icon: "refresh",
+                    title: "Analysis in Progress",
+                    description: "We're currently processing your latest transactions for deeper insights.",
+                    urgency: "medium"
+                }
+            ],
+            projectedSurplus: 0,
+            burnRisk: "Moderate",
+            burnRiskDetail: "Risk analysis will refresh shortly.",
+            lifestyleBalance: { essential: 50, discretionary: 50 }
+        }
+    }
 
     return res.status(200).json(
-        new ApiResponse(200, { insights }, "Insights generated successfully")
+        new ApiResponse(200, structured, "Insights attempt completed")
     )
 })
 

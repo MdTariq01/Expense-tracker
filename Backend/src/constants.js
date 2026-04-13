@@ -4,5 +4,7 @@ export const EXPENSE_CATEGORIES = [
     "Shopping",
     "Entertainment",
     "Health",
+    "Education",
+    "Utilities",
     "Other",
 ]

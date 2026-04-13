@@ -62,7 +62,7 @@ export const getExpenses = asyncHandler(async (req, res) => {
         if (endDate) filter.date.$lte = new Date(endDate)
     }
 
-    const expenses = await Expense.find(filter).sort({ date: -1 })
+    const expenses = await Expense.find(filter).sort({ date: -1, createdAt: -1 })
 
     return res
         .status(200)

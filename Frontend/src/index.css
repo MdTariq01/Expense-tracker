@@ -1,0 +1,128 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f0faf4;
+    color: #161d19;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Manrope', sans-serif;
+  }
+}
+
+@layer components {
+  .material-symbols-outlined {
+    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    user-select: none;
+  }
+
+  /* Sidebar nav active link */
+  .nav-link-active {
+    @apply text-primary-light font-semibold border-l-2 border-primary-light pl-3 -ml-3;
+  }
+
+  /* Input base style */
+  .input-base {
+    @apply w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-on-surface placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all;
+    border: none;
+  }
+
+  /* Card base */
+  .card {
+    @apply bg-surface rounded-2xl shadow-card border border-primary/5;
+  }
+
+  /* Green button */
+  .btn-primary {
+    @apply bg-primary text-white rounded-full px-6 py-3 font-semibold text-sm transition-all hover:bg-primary/90 hover:shadow-emerald active:scale-95 inline-flex items-center gap-2;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply text-slate-500 hover:text-on-surface transition-colors text-sm font-medium;
+  }
+
+  /* Status badge */
+  .badge-completed {
+    @apply px-2 py-0.5 bg-mint-light text-[9px] font-black uppercase tracking-tighter text-primary rounded;
+  }
+
+  .badge-pending {
+    @apply px-2 py-0.5 bg-slate-100 text-[9px] font-black uppercase tracking-tighter text-slate-500 rounded;
+  }
+  
+  /* Category pill */
+  .category-pill {
+    @apply px-3 py-1 rounded-full text-xs font-bold;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #d1fae5;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #6ee7b7;
+  }
+}
+
+@layer utilities {
+  /* Superscript cents */
+  .amount-superscript sup {
+    font-size: 0.45em;
+    vertical-align: super;
+    font-weight: 600;
+    color: #94a3b8;
+  }
+
+  /* Fade in animation */
+  .fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Pulse green dot */
+  .pulse-dot {
+    animation: pulseDot 2s infinite;
+  }
+
+  @keyframes pulseDot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+}
