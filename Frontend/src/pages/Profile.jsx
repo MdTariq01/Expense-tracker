@@ -81,17 +81,27 @@ const Profile = () => {
   };
 
   const savePassword = async () => {
-    if (!passwords.newPassword || passwords.newPassword.length < 6) {
+    if (passwords.newPassword && passwords.newPassword.length < 6) {
       setMessage({ type: 'error', text: 'New password must be at least 6 characters' });
+      return;
+    }
+    if (!passwords.currentPassword) {
+      setMessage({ type: 'error', text: 'Current password is required to verify changes' });
       return;
     }
     setLoading(true);
     try {
-      await api.patch('/auth/password', passwords);
-      setMessage({ type: 'success', text: 'Password updated successfully!' });
+      const payload = {
+        ...passwords,
+        twoFactorEnabled: formData.twoFactorEnabled
+      };
+      const res = await api.patch('/auth/password', payload);
+      const updatedUser = res.data?.data || res.data;
+      updateLocalUser(updatedUser);
+      setMessage({ type: 'success', text: 'Security settings updated successfully!' });
       setPasswords({ currentPassword: '', newPassword: '' });
     } catch (err) {
-      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to update password' });
+      setMessage({ type: 'error', text: err.response?.data?.message || 'Failed to update security' });
     } finally {
       setLoading(false);
     }

@@ -69,9 +69,11 @@ const Sidebar = () => {
             </span>
             <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Premium Access</p>
           </div>
-          <button className="w-full py-2 px-3 bg-primary hover:bg-primary/80 text-white rounded-lg font-semibold text-xs transition-colors shadow-lg">
-            Upgrade to Pro
-          </button>
+          <Link to="/upgrade" className="block">
+            <button className="w-full py-2 px-3 bg-primary hover:bg-primary/80 text-white rounded-lg font-semibold text-xs transition-colors shadow-lg">
+              Upgrade to Pro
+            </button>
+          </Link>
         </div>
 
         {/* User Avatar */}

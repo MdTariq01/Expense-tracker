@@ -277,8 +277,8 @@ const Expenses = () => {
                 </span>
 
                 {/* Amount */}
-                <span className={`text-sm font-extrabold whitespace-nowrap ${isIncome ? 'text-primary' : 'text-error'}`}>
-                  {isIncome ? '+' : '-'}${Math.abs(expense.amount).toFixed(2)}
+                <span className="text-sm font-extrabold whitespace-nowrap text-error">
+                  -{symbol}{Math.abs(expense.amount).toFixed(2)}
                 </span>
 
                 {/* Actions */}
