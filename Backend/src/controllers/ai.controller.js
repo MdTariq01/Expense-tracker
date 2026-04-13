@@ -53,32 +53,31 @@ export const getSpendInsights = asyncHandler(async (req, res) => {
         .join("\n")
 
     const prompt = `
-SYSTEM: You are a financial expert AI. Return ONLY a valid JSON object. No narrative outside the JSON.
-Today's date is ${new Date().toDateString()}.
-
-User's total spend (last 90 days): ${userCurrency} ${totalSpend.toFixed(2)}
-Spending by category: ${JSON.stringify(byCategory, null, 2)}
-
-Recent transactions:
+SYSTEM: You are a elite personal financial advisor. Your task is to analyze the user's spending patterns and provide actionable insights.
+User: ${req.user?.name || "Member"}
+Total Spend (90 days): ${userCurrency} ${totalSpend.toFixed(2)}
+Categories: ${JSON.stringify(byCategory, null, 2)}
+Merchant Activity:
 ${expenseList}
 
-RETURN THIS JSON STRUCTURE:
+RESPONSE RULES:
+- Return ONLY a valid JSON object.
+- "narrative": A high-quality 2-4 sentence analysis starting with a warm greeting to ${req.user?.name || "there"}. Mention specific categories or merchants if relevant.
+- "projectedSurplus": Numerical estimate of savings relative to monthly income (${req.user?.monthlyIncome || 0}).
+- "burnRisk": "Low" | "Moderate" | "Urgent" based on spending vs income.
+- "burnRiskDetail": One descriptive sentence.
+- "lifestyleBalance": { "essential": <percentage>, "discretionary": <percentage> }
+- "items": Array of 3 specific financial tips. Use material symbol icons.
+
+JSON FORMAT:
 {
-  "narrative": "A 2-3 sentence overview of the financial health.",
-  "projectedSurplus": <number>,
-  "burnRisk": "Low" | "Moderate" | "Urgent",
-  "burnRiskDetail": "One sentence explaining the risk level.",
-  "lifestyleBalance": {
-     "essential": <number, 0-100>,
-     "discretionary": <number, 0-100>
-  },
+  "narrative": "...",
+  "projectedSurplus": 0,
+  "burnRisk": "Low",
+  "burnRiskDetail": "...",
+  "lifestyleBalance": { "essential": 60, "discretionary": 40 },
   "items": [
-    {
-      "icon": "Material Symbol name (e.g. 'trending_down', 'savings', 'warning')",
-      "title": "Short title",
-      "description": "One sentence tip",
-      "urgency": "low" | "medium" | "high"
-    }
+    { "icon": "...", "title": "...", "description": "...", "urgency": "low" }
   ]
 }
 `.trim()

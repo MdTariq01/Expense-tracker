@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const navLinks = [
@@ -6,7 +6,6 @@ const navLinks = [
   { to: '/expenses', icon: 'receipt_long', label: 'Expenses' },
   { to: '/add-expense', icon: 'add_circle', label: 'Add Expense' },
   { to: '/insights', icon: 'insights', label: 'Insights' },
-  { to: '/settings', icon: 'settings', label: 'Settings' },
 ];
 
 const Sidebar = () => {
@@ -76,15 +75,19 @@ const Sidebar = () => {
         </div>
 
         {/* User Avatar */}
-        <div className="flex items-center gap-3 pt-4 border-t border-white/5">
-          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
-            {user?.name?.charAt(0)?.toUpperCase() || 'U'}
+        <Link to="/profile" className="flex items-center gap-3 pt-4 border-t border-white/5 hover:bg-white/5 p-2 rounded-xl transition-colors group">
+          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary-light to-primary flex items-center justify-center text-white font-bold text-sm flex-shrink-0 overflow-hidden">
+            {user?.avatar ? (
+              <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+            ) : (
+              user?.name?.charAt(0)?.toUpperCase() || 'U'
+            )}
           </div>
           <div className="overflow-hidden flex-1">
-            <p className="text-xs font-bold truncate">{user?.name || 'Workspace User'}</p>
+            <p className="text-xs font-bold truncate group-hover:text-primary-light transition-colors">{user?.name || 'Workspace User'}</p>
             <p className="text-[10px] text-slate-500 truncate">{user?.email || 'Premium Member'}</p>
           </div>
-        </div>
+        </Link>
       </div>
     </aside>
   );

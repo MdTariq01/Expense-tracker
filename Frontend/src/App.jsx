@@ -11,7 +11,7 @@ import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import AddExpense from './pages/AddExpense';
 import Insights from './pages/Insights';
-import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 import Landing from './pages/Landing';
 
 // ── Protected layout wrapper (sidebar + navbar) ──────────────────────────────
@@ -78,7 +78,8 @@ function App() {
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/add-expense" element={<AddExpense />} />
             <Route path="/insights" element={<Insights />} />
-            <Route path="/settings" element={<Settings />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Profile />} />
           </Route>
 
           {/* Default redirect */}

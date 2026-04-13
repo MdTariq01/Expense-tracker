@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { CATEGORIES } from '../constants';
 
@@ -14,6 +15,7 @@ const EMPTY_FORM = {
 };
 
 const AddExpense = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const editId = searchParams.get('edit');
@@ -200,7 +202,7 @@ const AddExpense = () => {
           <textarea
             value={aiText}
             onChange={(e) => setAiText(e.target.value)}
-            placeholder={`e.g., Dinner at Joe's for $45 last night for the team celebration`}
+            placeholder={`e.g., Dinner at Joe's for ${user?.currency === 'INR' ? '₹' : '$'}45 last night for the team celebration`}
             rows={4}
             className="input-base resize-none mb-4 leading-relaxed"
           />
@@ -258,7 +260,9 @@ const AddExpense = () => {
                     Amount
                   </label>
                   <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+                      {user?.currency === 'INR' ? '₹' : '$'}
+                    </span>
                     <input
                       type="number"
                       name="amount"
@@ -437,7 +441,9 @@ const AddExpense = () => {
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Amount</label>
                 <div className="relative">
-                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">$</span>
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm">
+                    {user?.currency === 'INR' ? '₹' : '$'}
+                  </span>
                   <input type="number" name="amount" value={form.amount} onChange={handleChange} className="input-base pl-7" step="0.01" min="0" required />
                 </div>
               </div>

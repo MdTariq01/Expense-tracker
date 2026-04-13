@@ -3,6 +3,7 @@ import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/AsyncHandler.js"
+import { uploadOnCloudinary } from "../utils/cloudinary.js"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -34,7 +35,7 @@ const generateAccessAndRefreshTokens = async (userId) => {
  * POST /api/auth/register
  */
 export const register = asyncHandler(async (req, res) => {
-    const { name, email, password } = req.body
+    const { name, email, password, monthlyIncome, currency } = req.body
 
     if (!name || !email || !password) {
         throw new ApiError(400, "Name, email and password are required")
@@ -45,7 +46,13 @@ export const register = asyncHandler(async (req, res) => {
         throw new ApiError(409, "Email is already registered")
     }
 
-    const user = await User.create({ name, email, password })
+    const user = await User.create({ 
+        name, 
+        email, 
+        password,
+        monthlyIncome: monthlyIncome ? Number(monthlyIncome) : 0,
+        currency: currency || "USD"
+    })
     
     // Generate both tokens
     const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(user._id)
@@ -66,7 +73,8 @@ export const register = asyncHandler(async (req, res) => {
                         currency: user.currency,
                         taxRate: user.taxRate,
                         membershipStatus: user.membershipStatus,
-                        twoFactorEnabled: user.twoFactorEnabled
+                        twoFactorEnabled: user.twoFactorEnabled,
+                        avatar: user.avatar
                     },
                 },
                 "Account created successfully"
@@ -113,7 +121,8 @@ export const login = asyncHandler(async (req, res) => {
                         currency: user.currency,
                         taxRate: user.taxRate,
                         membershipStatus: user.membershipStatus,
-                        twoFactorEnabled: user.twoFactorEnabled
+                        twoFactorEnabled: user.twoFactorEnabled,
+                        avatar: user.avatar
                     },
                 },
                 "Logged in successfully"
@@ -201,6 +210,15 @@ export const getMe = asyncHandler(async (req, res) => {
 export const updateProfile = asyncHandler(async (req, res) => {
     const { name, email, monthlyIncome, currency, taxRate, twoFactorEnabled } = req.body
 
+    const avatarLocalPath = req.file?.path
+    let avatarUrl = ""
+    if (avatarLocalPath) {
+        const cloudinaryRes = await uploadOnCloudinary(avatarLocalPath)
+        if (cloudinaryRes) {
+            avatarUrl = cloudinaryRes.secure_url
+        }
+    }
+
     const user = await User.findById(req.user._id)
 
     if (name) user.name = name
@@ -209,6 +227,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
     if (currency) user.currency = currency
     if (taxRate !== undefined) user.taxRate = Number(taxRate)
     if (twoFactorEnabled !== undefined) user.twoFactorEnabled = !!twoFactorEnabled
+    if (avatarUrl) user.avatar = avatarUrl
 
     await user.save({ validateBeforeSave: false })
 

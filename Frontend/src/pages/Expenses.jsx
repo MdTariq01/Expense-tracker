@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import { CATEGORIES, CATEGORY_ICONS, CATEGORY_COLORS } from '../constants';
 
@@ -22,6 +23,7 @@ const formatDate = (d) => {
 };
 
 const Expenses = () => {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [allExpenses, setAllExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -231,9 +233,9 @@ const Expenses = () => {
           </div>
         ) : (
           paginated.map((expense) => {
-            const isIncome = expense.amount > 0;
             const icon = CATEGORY_ICONS[expense.category] || 'category';
             const colors = CATEGORY_COLORS[expense.category] || CATEGORY_COLORS['Other'];
+            const symbol = user?.currency === 'INR' ? '₹' : '$';
             return (
               <div
                 key={expense._id}

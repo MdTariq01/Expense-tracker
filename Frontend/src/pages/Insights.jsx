@@ -1,10 +1,12 @@
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import InsightCard from '../components/InsightCard';
 
 // ── Header UI ──────────────────────────────────────────────────────────
 
 const Insights = () => {
+  const { user } = useAuth();
   const [insights, setInsights] = useState(null);
   const [loading, setLoading] = useState(false);
   const [generated, setGenerated] = useState(false);
@@ -151,7 +153,7 @@ const Insights = () => {
                 <div>
                   <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Projected Surplus</p>
                   <div className="text-4xl font-extrabold font-headline text-white mt-2">
-                    ${(data.projectedSurplus || 0).toLocaleString()}
+                    {user?.currency === 'INR' ? '₹' : '$'}{(data.projectedSurplus || 0).toLocaleString()}
                     <span className="text-lg text-slate-500">.00</span>
                   </div>
                 </div>

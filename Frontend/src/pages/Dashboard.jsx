@@ -89,7 +89,7 @@ const Dashboard = () => {
               Remaining Budget (Monthly)
             </span>
             <div className={`text-5xl md:text-6xl font-extrabold tracking-tighter font-headline ${remainingBudget < 0 ? 'text-error' : 'text-on-surface'}`}>
-              ${budgetParts[0]}
+              {user?.currency === 'INR' ? '₹' : '$'}{budgetParts[0]}
               <sup className="text-2xl font-semibold align-top ml-1 text-slate-400">.{budgetParts[1]}</sup>
             </div>
             <div className="mt-6">
@@ -110,7 +110,7 @@ const Dashboard = () => {
               Spent This Month
             </span>
             <div className="text-4xl font-extrabold text-error font-headline">
-              ${loading ? '—' : spentThisMonth.toFixed(2)}
+              {user?.currency === 'INR' ? '₹' : '$'}{loading ? '—' : spentThisMonth.toFixed(2)}
             </div>
           </div>
           <div className="mt-4 pt-5 border-t border-slate-100">

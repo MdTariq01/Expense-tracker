@@ -57,8 +57,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Register
-  const register = async (name, email, password) => {
-    const res = await api.post('/auth/register', { name, email, password });
+  const register = async (name, email, password, monthlyIncome, currency) => {
+    const res = await api.post('/auth/register', { 
+      name, 
+      email, 
+      password, 
+      monthlyIncome, 
+      currency 
+    });
     // Auto-login after registration
     if (res.data?.data?.accessToken) {
       const { accessToken: token, user: userData } = res.data.data;

@@ -5,7 +5,13 @@ import { useAuth } from '../context/AuthContext';
 const Register = () => {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '' });
+  const [form, setForm] = useState({ 
+    name: '', 
+    email: '', 
+    password: '',
+    monthlyIncome: '',
+    currency: 'USD'
+  });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -23,10 +29,14 @@ const Register = () => {
     setLoading(true);
     setError('');
     try {
-      await register(form.name, form.email, form.password);
+      await register(form.name, form.email, form.password, form.monthlyIncome, form.currency);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      if (err.response?.status === 409) {
+        setError('An account with this email already exists. Try logging in instead.');
+      } else {
+        setError(err.response?.data?.message || 'Registration failed. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -122,6 +132,51 @@ const Register = () => {
                   minLength={6}
                   className="input-base pl-10"
                 />
+              </div>
+            </div>
+
+            {/* Income & Currency Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 font-label">
+                  Monthly Salary
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined text-slate-300 text-base absolute left-3 top-1/2 -translate-y-1/2">
+                    payments
+                  </span>
+                  <input
+                    type="number"
+                    name="monthlyIncome"
+                    value={form.monthlyIncome}
+                    onChange={handleChange}
+                    placeholder="e.g. 5000"
+                    required
+                    className="input-base pl-10"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2 font-label">
+                  Currency
+                </label>
+                <div className="relative">
+                  <span className="material-symbols-outlined text-slate-300 text-base absolute left-3 top-1/2 -translate-y-1/2">
+                    currency_exchange
+                  </span>
+                  <select
+                    name="currency"
+                    value={form.currency}
+                    onChange={handleChange}
+                    className="input-base pl-10 appearance-none pr-8"
+                  >
+                    <option value="USD">USD ($)</option>
+                    <option value="INR">INR (₹)</option>
+                  </select>
+                  <span className="material-symbols-outlined absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none text-base">
+                    expand_more
+                  </span>
+                </div>
               </div>
             </div>
 

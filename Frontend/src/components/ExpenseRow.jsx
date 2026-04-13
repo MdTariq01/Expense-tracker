@@ -1,4 +1,5 @@
 import { CATEGORY_COLORS, CATEGORY_ICONS } from '../constants';
+import { useAuth } from '../context/AuthContext';
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '';
@@ -15,6 +16,7 @@ const formatDate = (dateStr) => {
  * Props: expense { _id, title, amount, category, date, status, notes }
  */
 const ExpenseRow = ({ expense, onEdit, onDelete, showActions = false }) => {
+  const { user } = useAuth();
   const {
     _id,
     title = 'Untitled',
@@ -24,7 +26,7 @@ const ExpenseRow = ({ expense, onEdit, onDelete, showActions = false }) => {
     status = 'completed',
   } = expense;
 
-  const isIncome = amount > 0;
+  const symbol = user?.currency === 'INR' ? '₹' : '$';
   const icon = CATEGORY_ICONS[category] || 'category';
   const colors = CATEGORY_COLORS[category] || CATEGORY_COLORS['Other'];
   const displayDate = formatDate(date);
@@ -46,8 +48,8 @@ const ExpenseRow = ({ expense, onEdit, onDelete, showActions = false }) => {
 
       {/* Amount + Badge */}
       <div className="text-right flex-shrink-0">
-        <p className={`text-sm font-extrabold ${isIncome ? 'text-primary' : 'text-error'}`}>
-          {isIncome ? '+' : '-'}${Math.abs(amount).toFixed(2)}
+        <p className="text-sm font-extrabold text-error">
+          -{symbol}{Math.abs(amount).toFixed(2)}
         </p>
         <span className={status === 'completed' ? 'badge-completed' : 'badge-pending'}>
           {status}
