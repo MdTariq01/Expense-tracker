@@ -97,7 +97,11 @@ const Login = () => {
                 <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 font-label">
                   Security Password
                 </label>
-                <button type="button" className="text-[10px] font-bold text-primary hover:text-primary/80 transition-colors tracking-widest uppercase">
+                <button
+                  type="button"
+                  onClick={() => alert('Password reset functionality is coming soon. Please contact support in the meantime.')}
+                  className="text-[10px] font-bold text-primary hover:text-primary/80 transition-colors tracking-widest uppercase"
+                >
                   Forgot?
                 </button>
               </div>

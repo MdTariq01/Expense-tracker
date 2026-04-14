@@ -13,6 +13,8 @@ import AddExpense from './pages/AddExpense';
 import Insights from './pages/Insights';
 import Profile from './pages/Profile';
 import Membership from './pages/Membership';
+import Terms from './pages/Terms';
+import { Privacy, Philosophy } from './pages/StaticPages';
 import Landing from './pages/Landing';
 
 // ── Protected layout wrapper (sidebar + navbar) ──────────────────────────────
@@ -66,6 +68,9 @@ function App() {
           <Route path="/" element={<Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/philosophy" element={<Philosophy />} />
 
           {/* Protected routes — all wrapped in AppLayout */}
           <Route

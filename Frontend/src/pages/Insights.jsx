@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 import InsightCard from '../components/InsightCard';
+import RadarChart from '../components/RadarChart';
 
 // ── Header UI ──────────────────────────────────────────────────────────
 
@@ -107,8 +108,8 @@ const Insights = () => {
         <div className="space-y-6 slide-up">
           {/* Top Row */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Narrative card */}
-            <div className="lg:col-span-2 card p-8">
+            {/* Main Narrative card - Glassmorphism */}
+            <div className="lg:col-span-2 card p-8 bg-white/40 backdrop-blur-xl border-white/20 shadow-emerald-sm">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -183,46 +184,45 @@ const Insights = () => {
             </div>
           </div>
 
-          {/* Lifestyle Balance */}
-          <div className="card p-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Lifestyle Equilibrium - Radar Chart */}
+          <div className="card p-8 bg-white/40 backdrop-blur-xl border-white/20 shadow-emerald-sm slide-up" style={{ animationDelay: '200ms' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
-                <h2 className="text-base font-bold text-on-surface font-headline mb-2">Lifestyle Balance</h2>
-                <p className="text-sm text-slate-500 mb-6">
-                  Your spending is currently skewed towards &ldquo;Experience&rdquo; rather than &ldquo;Foundation.&rdquo; Here&apos;s your equilibrium:
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="p-2 bg-primary/10 rounded-xl">
+                    <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      balance
+                    </span>
+                  </div>
+                  <h2 className="text-base font-black text-on-surface font-headline uppercase tracking-widest leading-none">Lifestyle Equilibrium</h2>
+                </div>
+                <p className="text-sm text-slate-500 mb-8 leading-relaxed font-medium">
+                  Your spending is currently skewed towards &ldquo;Experience&rdquo; rather than &ldquo;Foundation.&rdquo; This radar analysis shows your capital distribution across machine-learned clusters.
                 </p>
 
-                {[
-                  { label: 'Essential', value: data.lifestyleBalance?.essential || 0, color: 'bg-primary' },
-                  { label: 'Discretionary', value: data.lifestyleBalance?.discretionary || 0, color: 'bg-primary-light' },
-                ].map((bar) => (
-                  <div key={bar.label} className="mb-4">
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{bar.label}</span>
-                      <span className="text-xs font-bold text-on-surface">{bar.value}%</span>
+                <div className="space-y-5">
+                  {[
+                    { label: 'Essential Base', value: data.lifestyleBalance?.essential || 0, color: '#006c49' },
+                    { label: 'Discretionary Flux', value: data.lifestyleBalance?.discretionary || 0, color: '#4edea3' },
+                  ].map((item) => (
+                    <div key={item.label} className="group">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 group-hover:text-on-surface transition-colors">{item.label}</span>
+                        <span className="text-xs font-black text-on-surface">{item.value}%</span>
+                      </div>
+                      <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-1000"
+                          style={{ width: `${item.value}%`, backgroundColor: item.color }}
+                        />
+                      </div>
                     </div>
-                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${bar.color} rounded-full transition-all duration-1000`}
-                        style={{ width: `${bar.value}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
 
-              <div className="flex flex-col items-center justify-center text-center border-l border-slate-100 pl-8">
-                <div className="w-16 h-16 bg-mint-light rounded-2xl flex items-center justify-center mb-4">
-                  <span className="material-symbols-outlined text-3xl text-primary" style={{ fontVariationSettings: "'FILL' 1" }}>
-                    bar_chart_4_bars
-                  </span>
-                </div>
-                <h3 className="text-base font-bold text-on-surface font-headline mb-2">
-                  Visual spend breakdown by AI clusters
-                </h3>
-                <p className="text-sm text-slate-500">
-                  Machine-learned categories based on merchant metadata
-                </p>
+              <div className="h-[300px] flex items-center justify-center relative">
+                <RadarChart data={data.lifestyleBalance} />
               </div>
             </div>
           </div>

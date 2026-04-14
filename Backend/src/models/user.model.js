@@ -44,12 +44,18 @@ const userSchema = new mongoose.Schema(
             default: "Standard",
         },
         avatar: {
-            type: String,
             default: "",
+            type: String,
+        },
+        forgotPasswordToken: {
+            type: String,
+        },
+        forgotPasswordTokenExpiry: {
+            type: Date,
         },
     },
     { timestamps: true }
-)
+);
 
 // Hash password before saving
 userSchema.pre("save", async function () {
