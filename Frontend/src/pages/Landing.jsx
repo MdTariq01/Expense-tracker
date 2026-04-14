@@ -16,7 +16,7 @@ const Landing = () => {
         
         <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
           <a href="#features" className="hover:text-primary transition-colors">Features</a>
-          <a href="#about" className="hover:text-primary transition-colors">Philosophy</a>
+          <Link to="/philosophy" className="hover:text-primary transition-colors">Philosophy</Link>
           <Link to="/login" className="hover:text-primary transition-colors">Login</Link>
           <Link to="/register" className="bg-primary text-white px-6 py-2.5 rounded-full hover:shadow-emerald transition-all active:scale-95">
             Get Started
@@ -137,10 +137,19 @@ const Landing = () => {
             <p className="text-xs max-w-xs text-center md:text-left">Elevating personal finance through intentional tracking and intelligent design.</p>
           </div>
           
-          <div className="flex gap-12 text-xs font-bold uppercase tracking-widest overflow-hidden">
-            <a href="#" className="hover:text-white transition-colors">Privacy</a>
-            <a href="#" className="hover:text-white transition-colors">Terms</a>
-            <a href="#" className="hover:text-white transition-colors">Github</a>
+          <div className="flex flex-wrap justify-center gap-8 md:gap-12 text-[10px] font-black uppercase tracking-[0.15em] overflow-hidden">
+            <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+            <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+            <Link to="/upgrade" className="hover:text-white transition-colors">Membership</Link>
+            <a 
+              href="https://github.com/MdTariq01/Expense-tracker" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="hover:text-white transition-colors flex items-center gap-1.5"
+            >
+              Github
+              <span className="material-symbols-outlined text-[10px]">open_in_new</span>
+            </a>
           </div>
           
           <p className="text-[10px] font-mono">&copy; 2024 FINANCIAL ATELIER SYSTEM // ALL RIGHTS RESERVED</p>

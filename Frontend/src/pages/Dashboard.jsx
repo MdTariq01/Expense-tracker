@@ -5,6 +5,7 @@ import api from '../api/axios';
 import StatCard from '../components/StatCard';
 import CategoryDonut from '../components/CategoryDonut';
 import ExpenseRow from '../components/ExpenseRow';
+import TrendChart from '../components/TrendChart';
 
 
 
@@ -80,7 +81,7 @@ const Dashboard = () => {
       {/* ── Hero Stat Cards ─────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {/* Total Balance */}
-        <div className="md:col-span-2 card p-8 relative overflow-hidden group">
+        <div className="md:col-span-2 card p-8 relative overflow-hidden group bg-white/40 backdrop-blur-xl border-white/20 shadow-emerald-sm">
           <div className="absolute right-[-8%] bottom-[-20%] opacity-[0.03] group-hover:scale-110 transition-transform duration-700 pointer-events-none">
             <span className="material-symbols-outlined" style={{ fontSize: '12rem' }}>account_balance_wallet</span>
           </div>
@@ -104,7 +105,7 @@ const Dashboard = () => {
         </div>
 
         {/* Spent This Month */}
-        <div className="card p-8 flex flex-col justify-between">
+        <div className="card p-8 flex flex-col justify-between bg-white/40 backdrop-blur-xl border-white/20 shadow-emerald-sm">
           <div>
             <span className="text-[0.65rem] font-bold uppercase tracking-[0.15em] text-slate-400 font-label mb-3 block">
               Spent This Month
@@ -125,7 +126,7 @@ const Dashboard = () => {
       {/* ── Insights Grid ──────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Donut Chart */}
-        <div className="lg:col-span-1 card p-8 flex flex-col">
+        <div className="lg:col-span-1 card p-8 flex flex-col bg-white/40 backdrop-blur-xl border-white/20 shadow-emerald-sm">
           <h2 className="text-base font-bold mb-6 text-on-surface font-headline">Top Category</h2>
           {loading ? (
             <div className="flex-1 flex items-center justify-center min-h-[200px]">
@@ -137,7 +138,7 @@ const Dashboard = () => {
         </div>
 
         {/* Recent Transactions */}
-        <div className="lg:col-span-2 card p-8">
+        <div className="lg:col-span-2 card p-8 bg-white/40 backdrop-blur-xl border-white/20 shadow-emerald-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-base font-bold text-on-surface font-headline">Recent Transactions</h2>
             <Link
@@ -178,34 +179,32 @@ const Dashboard = () => {
       </div>
 
       {/* ── Bottom Cards ───────────────────────────────────────────────────── */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        {/* Workspace Analytics - dark image card */}
-        <div className="md:col-span-3 rounded-2xl overflow-hidden h-56 relative group bg-gradient-to-br from-slate-900 to-slate-800">
-          {/* Overlay pattern */}
-          <div className="absolute inset-0 opacity-5"
-            style={{
-              backgroundImage: 'repeating-linear-gradient(45deg, #fff 0, #fff 1px, transparent 0, transparent 50%)',
-              backgroundSize: '20px 20px',
-            }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent flex flex-col justify-center p-10 text-white">
-            <div className="flex items-center gap-2 mb-3">
-              <span className="material-symbols-outlined text-primary-light text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
-                bar_chart_4_bars
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Intelligence Engine</span>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 px-1 pb-16">
+        {/* Workspace Analytics - Glass Chart with Trend */}
+        <div className="md:col-span-3 card p-8 border border-white/40 shadow-emerald-sm relative group overflow-hidden bg-white/40 backdrop-blur-xl">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-primary/10 rounded-xl">
+                <span className="material-symbols-outlined text-primary text-xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                  monitoring
+                </span>
+              </div>
+              <div>
+                <h3 className="text-sm font-black text-on-surface font-headline uppercase tracking-widest leading-none">Spending Velocity</h3>
+                <p className="text-[10px] text-slate-400 font-bold tracking-widest mt-1 uppercase">Analysis of last 7 intervals</p>
+              </div>
             </div>
-            <h3 className="text-2xl font-bold font-headline mb-3">Workspace Analytics</h3>
-            <p className="max-w-md text-sm text-slate-300 leading-relaxed font-medium">
-              Track every movement of your capital with the precision of an atelier&apos;s master tailor. Review your quarterly growth metrics.
-            </p>
             <Link
               to="/insights"
-              className="mt-5 inline-flex items-center gap-2 text-primary-light text-xs font-bold hover:gap-3 transition-all"
+              className="text-[10px] font-black uppercase tracking-widest text-primary hover:text-primary-dark transition-colors flex items-center gap-1.5"
             >
-              Generate AI Insights
+              Intelligence Engine
               <span className="material-symbols-outlined text-sm">arrow_forward</span>
             </Link>
+          </div>
+          
+          <div className="h-48 w-full mt-2">
+            <TrendChart data={expenses} />
           </div>
         </div>
 
