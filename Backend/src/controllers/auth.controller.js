@@ -1,9 +1,11 @@
+import crypto from "crypto"
 import jwt from "jsonwebtoken"
 import { User } from "../models/user.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/AsyncHandler.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js"
+import { sendForgotPasswordEmail } from "../services/mail.service.js"
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -266,4 +268,75 @@ export const updatePassword = asyncHandler(async (req, res) => {
     return res
         .status(200)
         .json(new ApiResponse(200, user, "Security settings updated successfully"))
+})
+
+/**
+ * POST /api/auth/forgot-password
+ */
+export const forgotPassword = asyncHandler(async (req, res) => {
+    const { email } = req.body
+
+    const user = await User.findOne({ email })
+    if (!user) {
+        // Return same response to prevent email enumeration
+        return res.status(200).json(new ApiResponse(200, null, "If that email exists, a reset link was sent."))
+    }
+
+    // Generate token
+    const rawToken = crypto.randomBytes(32).toString("hex")
+    const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex")
+
+    user.forgotPasswordToken = hashedToken
+    user.forgotPasswordTokenExpiry = Date.now() + 15 * 60 * 1000 // 15 mins
+    await user.save({ validateBeforeSave: false })
+
+    try {
+        // Use centralized mail service to send password reset email
+        await sendForgotPasswordEmail(user.email, rawToken)
+        console.log(`Password reset email sent successfully to ${user.email}`)
+
+        return res.status(200).json(new ApiResponse(200, null, "If that email exists, a reset link was sent."))
+    } catch (error) {
+        // Revert tokens if email failed
+        user.forgotPasswordToken = undefined
+        user.forgotPasswordTokenExpiry = undefined
+        await user.save({ validateBeforeSave: false })
+        
+        console.error("Error sending password reset email:", error.message)
+        throw new ApiError(500, "There was an error sending the email. Please try again later.")
+    }
+})
+
+/**
+ * POST /api/auth/reset-password/:token
+ */
+export const resetPassword = asyncHandler(async (req, res) => {
+    const { password } = req.body
+
+    if (!password) {
+        throw new ApiError(400, "Password is required")
+    }
+
+    const hashedToken = crypto
+        .createHash("sha256")
+        .update(req.params.token)
+        .digest("hex")
+
+    const user = await User.findOne({
+        forgotPasswordToken: hashedToken,
+        forgotPasswordTokenExpiry: { $gt: Date.now() },
+    })
+
+    if (!user) {
+        throw new ApiError(400, "Token is invalid or expired.")
+    }
+
+    // Set new password (pre-save hook will hash it automatically)
+    user.password = password
+    user.forgotPasswordToken = undefined
+    user.forgotPasswordTokenExpiry = undefined
+    
+    await user.save()
+
+    return res.status(200).json(new ApiResponse(200, null, "Password reset successful."))
 })

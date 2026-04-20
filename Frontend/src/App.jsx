@@ -16,6 +16,8 @@ import Membership from './pages/Membership';
 import Terms from './pages/Terms';
 import { Privacy, Philosophy } from './pages/StaticPages';
 import Landing from './pages/Landing';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // ── Protected layout wrapper (sidebar + navbar) ──────────────────────────────
 const AppLayout = () => (
@@ -71,6 +73,8 @@ function App() {
           <Route path="/terms" element={<Terms />} />
           <Route path="/privacy" element={<Privacy />} />
           <Route path="/philosophy" element={<Philosophy />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
           {/* Protected routes — all wrapped in AppLayout */}
           <Route
