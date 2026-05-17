@@ -9,7 +9,7 @@ const transporter = nodemailer.createTransport({
 })
 
 export const sendForgotPasswordEmail = async (email, resetToken) => {
-    const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173"
+    const frontendUrl = process.env.FRONTEND_URL || "https://expense-tracker-xi-five-35.vercel.app/"
     const resetUrl = `${frontendUrl}/reset-password/${resetToken}`
 
     await transporter.sendMail({
