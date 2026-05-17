@@ -274,6 +274,7 @@ export const updatePassword = asyncHandler(async (req, res) => {
  * POST /api/auth/forgot-password
  */
 export const forgotPassword = asyncHandler(async (req, res) => {
+    console.log("forgotPassword hit, email:", req.body.email)
     const { email } = req.body
 
     const user = await User.findOne({ email })
