@@ -210,7 +210,7 @@ export const getMe = asyncHandler(async (req, res) => {
  * PATCH /api/auth/profile — protected
  */
 export const updateProfile = asyncHandler(async (req, res) => {
-    const { name, email, monthlyIncome, currency, taxRate, twoFactorEnabled } = req.body
+    const { name, email, monthlyIncome, currency, taxRate, twoFactorEnabled, membershipStatus } = req.body
 
     const avatarLocalPath = req.file?.path
     let avatarUrl = ""
@@ -229,6 +229,7 @@ export const updateProfile = asyncHandler(async (req, res) => {
     if (currency) user.currency = currency
     if (taxRate !== undefined) user.taxRate = Number(taxRate)
     if (twoFactorEnabled !== undefined) user.twoFactorEnabled = !!twoFactorEnabled
+    if (membershipStatus) user.membershipStatus = membershipStatus
     if (avatarUrl) user.avatar = avatarUrl
 
     await user.save({ validateBeforeSave: false })
