@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
 import { Expense } from "../models/expense.model.js"
+import { Income } from "../models/income.model.js"
 import { ApiError } from "../utils/ApiError.js"
 import { ApiResponse } from "../utils/ApiResponse.js"
 import { asyncHandler } from "../utils/AsyncHandler.js"
@@ -20,64 +21,113 @@ const getGemini = () => {
  * Fetches last 90 days of expenses and asks Gemini for a personal analysis.
  */
 export const getSpendInsights = asyncHandler(async (req, res) => {
-    // Fetch last 90 days of expenses
     const since = new Date()
     since.setDate(since.getDate() - 90)
 
-    const expenses = await Expense.find({
-        user: req.user._id,
-        date: { $gte: since },
-    }).sort({ date: -1 })
+    // Fetch last 90 days of expenses and incomes
+    const [expenses, incomes] = await Promise.all([
+        Expense.find({
+            user: req.user._id,
+            date: { $gte: since },
+        }).sort({ date: -1 }),
+        Income.find({
+            user: req.user._id,
+            date: { $gte: since },
+        }).sort({ date: -1 }),
+    ])
 
     if (expenses.length === 0) {
         return res.status(200).json(
             new ApiResponse(
                 200,
-                { narrative: "No expenses found in the last 90 days. Start adding expenses to get AI insights!", items: [] },
+                {
+                    narrative: `Welcome ${req.user?.name || "there"}! Add some expenses to activate the AI Intelligence Engine. Once you log your spending, I will build customized, actionable insights for you.`,
+                    items: [
+                        {
+                            icon: "add_chart",
+                            title: "Build your ledger",
+                            description: "Add transactions to feed the analysis engine.",
+                            urgency: "low",
+                        }
+                    ],
+                    projectedSurplus: 0,
+                    burnRisk: "Low",
+                    burnRiskDetail: "Add entries to run risk simulations.",
+                    lifestyleBalance: { essential: 100, discretionary: 0 },
+                    savingsRate: 0,
+                },
                 "No data to analyze"
             )
         )
     }
 
-    // Build a compact summary for Gemini
+    // Build a highly rich aggregated summary for Gemini
     const totalSpend = expenses.reduce((sum, e) => sum + e.amount, 0)
+    const totalIncome = incomes.reduce((sum, i) => sum + i.amount, 0)
+    
+    // Monthly income baseline (prefer user's setting, fallback to actuals avg, fallback to 0)
+    const baseMonthlyIncome = req.user?.monthlyIncome || (totalIncome > 0 ? totalIncome / 3 : 0)
+
+    const netSavings = totalIncome - totalSpend
+    const savingsRate = totalIncome > 0 ? (netSavings / totalIncome) * 100 : (baseMonthlyIncome > 0 ? ((baseMonthlyIncome - (totalSpend / 3)) / baseMonthlyIncome) * 100 : 0)
+
     const byCategory = expenses.reduce((acc, e) => {
         acc[e.category] = (acc[e.category] || 0) + e.amount
         return acc
     }, {})
 
+    // Sort to find top categories
+    const sortedCategories = Object.entries(byCategory)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 3)
+        .map(([cat, amt]) => `${cat} (${amt.toFixed(2)})`)
+        .join(", ")
+
     const userCurrency = req.user?.currency || "USD"
     const expenseList = expenses
-        .slice(0, 30) // cap to 30 items to stay within token limits
+        .slice(0, 30) // cap to 30 items
         .map((e) => `- ${e.title} | ${userCurrency} ${e.amount} | ${e.category} | ${new Date(e.date).toDateString()}`)
         .join("\n")
 
     const prompt = `
-SYSTEM: You are a elite personal financial advisor. Your task is to analyze the user's spending patterns and provide actionable insights.
-User: ${req.user?.name || "Member"}
-Total Spend (90 days): ${userCurrency} ${totalSpend.toFixed(2)}
-Categories: ${JSON.stringify(byCategory, null, 2)}
-Merchant Activity:
+SYSTEM: You are "Financial Atelier Curator", an elite AI private wealth strategist. Your tone is warm, bespoke, highly professional, direct, and actionable. You evaluate data meticulously and do not generalize.
+
+User Context:
+- Name: ${req.user?.name || "Member"}
+- Standard Monthly Income Setting: ${userCurrency} ${baseMonthlyIncome.toFixed(2)}
+- Actual Incomes Logged (Last 90 days): ${userCurrency} ${totalIncome.toFixed(2)}
+- Actual Expenses Logged (Last 90 days): ${userCurrency} ${totalSpend.toFixed(2)}
+- Calculated Savings Rate: ${savingsRate.toFixed(1)}%
+- Top Spending Categories: ${sortedCategories || "None"}
+- Spend Categories Breakdown: ${JSON.stringify(byCategory, null, 2)}
+
+Recent Transactions:
 ${expenseList}
 
 RESPONSE RULES:
-- Return ONLY a valid JSON object.
-- "narrative": A high-quality 2-4 sentence analysis starting with a warm greeting to ${req.user?.name || "there"}. Mention specific categories or merchants if relevant.
-- "projectedSurplus": Numerical estimate of savings relative to monthly income (${req.user?.monthlyIncome || 0}).
-- "burnRisk": "Low" | "Moderate" | "Urgent" based on spending vs income.
-- "burnRiskDetail": One descriptive sentence.
-- "lifestyleBalance": { "essential": <percentage>, "discretionary": <percentage> }
-- "items": Array of 3 specific financial tips. Use material symbol icons.
+- Return ONLY a valid JSON object. Do not wrap it in markdown or comments.
+- "narrative": A highly premium, 2-3 sentence analysis addressed directly to ${req.user?.name?.split(" ")[0] || "there"}. Make specific observations about their high spend categories or overall pacing.
+- "projectedSurplus": Numerical monthly savings estimate. If actual income is 0 and profile income is 0, estimate 0.
+- "burnRisk": "Low" | "Moderate" | "Urgent" based on spending pacing vs actual income or profile income.
+- "burnRiskDetail": A single, razor-sharp descriptive sentence stating exactly why their pacing is at this risk level.
+- "lifestyleBalance": { "essential": <percentage>, "discretionary": <percentage> } based on their categories (Essential includes Utilities, Food, Health, Education; Discretionary includes Shopping, Entertainment, Travel). Make sure the percentages sum to exactly 100.
+- "savingsRate": The exact integer value of their calculated savings rate (e.g. 34). Can be negative if they spent more than they made.
+- "items": Array of exactly 3 granular, highly actionable financial suggestions. Each suggestion must have:
+  * "icon": A standard material symbols icon name (e.g. "savings", "trending_down", "shopping_bag", "payments", "receipt_long").
+  * "title": A short 3-5 word title.
+  * "description": A concise, tailored tip referencing their data.
+  * "urgency": "low" | "medium" | "high".
 
-JSON FORMAT:
+JSON SCHEMA EXPECTED:
 {
   "narrative": "...",
-  "projectedSurplus": 0,
+  "projectedSurplus": 1250,
   "burnRisk": "Low",
   "burnRiskDetail": "...",
   "lifestyleBalance": { "essential": 60, "discretionary": 40 },
+  "savingsRate": 34,
   "items": [
-    { "icon": "...", "title": "...", "description": "...", "urgency": "low" }
+    { "icon": "savings", "title": "...", "description": "...", "urgency": "low" }
   ]
 }
 `.trim()
@@ -89,7 +139,7 @@ JSON FORMAT:
         const result = await model.generateContent(prompt)
         const raw = result.response.text().trim()
         
-        // ROBUST EXTRACTION: Use regex to find the first { and last }
+        // Robust extraction of JSON
         const jsonMatch = raw.match(/\{[\s\S]*\}/);
         if (!jsonMatch) {
             throw new Error("No JSON found in AI response")
@@ -98,26 +148,40 @@ JSON FORMAT:
         structured = JSON.parse(jsonMatch[0])
     } catch (error) {
         console.error("GEMINI_INSIGHT_ERROR:", error.message)
-        // Fallback if AI fails or returns invalid JSON
+        // Dynamic robust fallback using our calculated aggregates
+        const simpleSurplus = Math.max(0, baseMonthlyIncome - (totalSpend / 3))
         structured = {
-            narrative: "The AI engine is currently refining your analysis. Please try again in a few minutes.",
+            narrative: `Hello ${req.user?.name?.split(" ")[0] || "there"}. Based on your last 90 days, you spent a total of ${userCurrency} ${totalSpend.toFixed(2)} with top categories being ${sortedCategories || "Other"}. Keep tracking to receive deeper strategist reports.`,
             items: [
                 {
-                    icon: "refresh",
-                    title: "Analysis in Progress",
-                    description: "We're currently processing your latest transactions for deeper insights.",
-                    urgency: "medium"
+                    icon: "trending_up",
+                    title: "Active Tracker Pacing",
+                    description: `Your regular logged expenses are averaging ${(totalSpend / 3).toFixed(0)} ${userCurrency} per month.`,
+                    urgency: "low",
+                },
+                {
+                    icon: "account_balance",
+                    title: "Track Income Streams",
+                    description: "Add all freelance, investments, and salary inputs under the Income page for a perfect cashflow map.",
+                    urgency: "medium",
+                },
+                {
+                    icon: "savings",
+                    title: "Target 20% Savings Rate",
+                    description: `Your calculated pacing is at a ${savingsRate.toFixed(0)}% savings rate.`,
+                    urgency: "low",
                 }
             ],
-            projectedSurplus: 0,
-            burnRisk: "Moderate",
-            burnRiskDetail: "Risk analysis will refresh shortly.",
-            lifestyleBalance: { essential: 50, discretionary: 50 }
+            projectedSurplus: Math.round(simpleSurplus),
+            burnRisk: savingsRate < 10 ? "Moderate" : "Low",
+            burnRiskDetail: `Currently pacing a ${savingsRate.toFixed(0)}% savings rate relative to cash inflow.`,
+            lifestyleBalance: { essential: 65, discretionary: 35 },
+            savingsRate: Math.round(savingsRate),
         }
     }
 
     return res.status(200).json(
-        new ApiResponse(200, structured, "Insights attempt completed")
+        new ApiResponse(200, structured, "Insights calculated successfully")
     )
 })
 

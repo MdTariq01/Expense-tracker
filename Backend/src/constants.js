@@ -8,3 +8,12 @@ export const EXPENSE_CATEGORIES = [
     "Utilities",
     "Other",
 ]
+
+export const INCOME_CATEGORIES = [
+    "Salary",
+    "Freelance",
+    "Business",
+    "Investment",
+    "Gift",
+    "Other",
+]

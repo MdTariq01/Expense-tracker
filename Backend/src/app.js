@@ -6,6 +6,8 @@ import helmet from "helmet"
 import authRoutes from "./routes/auth.routes.js"
 import expenseRoutes from "./routes/expense.routes.js"
 import aiRoutes from "./routes/ai.routes.js"
+import incomeRoutes from "./routes/income.routes.js"
+import paymentRoutes from "./routes/payment.routes.js"
 
 const app = express()
 
@@ -42,6 +44,8 @@ app.use(cookieParser())
 app.use("/api/auth", authRoutes)
 app.use("/api/expenses", expenseRoutes)
 app.use("/api/ai", aiRoutes)
+app.use("/api/income", incomeRoutes)
+app.use("/api/payment", paymentRoutes)
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", (req, res) => {

@@ -10,6 +10,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Expenses from './pages/Expenses';
 import AddExpense from './pages/AddExpense';
+import Income from './pages/Income';
 import Insights from './pages/Insights';
 import Profile from './pages/Profile';
 import Membership from './pages/Membership';
@@ -34,6 +35,7 @@ const AppLayout = () => (
         {[
           { to: '/dashboard', icon: 'dashboard', label: 'Home' },
           { to: '/expenses', icon: 'receipt_long', label: 'Exp' },
+          { to: '/income', icon: 'payments', label: 'Inc' },
           { to: '/add-expense', icon: 'add', label: '', fab: true },
           { to: '/insights', icon: 'insights', label: 'Stats' },
         ].map((item) =>
@@ -87,6 +89,7 @@ function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/expenses" element={<Expenses />} />
             <Route path="/add-expense" element={<AddExpense />} />
+            <Route path="/income" element={<Income />} />
             <Route path="/insights" element={<Insights />} />
             <Route path="/profile" element={<Profile />} />
             <Route path="/upgrade" element={<Membership />} />

@@ -30,7 +30,20 @@ const AddExpense = () => {
   const [aiLoading, setAiLoading] = useState(false);
   const [error, setError] = useState('');
   const [fetchLoading, setFetchLoading] = useState(false);
+  const [expenseCount, setExpenseCount] = useState(0);
   const fileRef = useRef(null);
+
+  // ── Fetch total expenses to enforce free tier limit ──────────────────────
+  useEffect(() => {
+    if (isEdit) return;
+    api.get('/expenses')
+      .then((res) => {
+        const rawData = res.data?.data || res.data || [];
+        const expensesArray = Array.isArray(rawData) ? rawData : (Array.isArray(rawData?.expenses) ? rawData.expenses : []);
+        setExpenseCount(expensesArray.length);
+      })
+      .catch(() => {});
+  }, [isEdit]);
 
   // ── Load existing expense for edit mode ───────────────────────────────────
   useEffect(() => {
@@ -145,6 +158,50 @@ const AddExpense = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const isPro = user?.membershipStatus === 'Pro';
+  const isCapped = !isEdit && !isPro && expenseCount >= 50;
+
+  if (isCapped) {
+    return (
+      <div className="p-6 md:p-8 max-w-2xl mx-auto w-full fade-in flex flex-col items-center justify-center min-h-[60vh]">
+        <div className="relative mb-6">
+          <div className="w-20 h-20 bg-amber-50 rounded-[2rem] flex items-center justify-center animate-bounce">
+            <span className="material-symbols-outlined text-4xl text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>
+              workspace_premium
+            </span>
+          </div>
+        </div>
+
+        <div className="text-center max-w-md">
+          <span className="font-label text-[10px] font-bold tracking-[0.2em] text-primary uppercase mb-2 block">
+            Limit Reached
+          </span>
+          <h1 className="font-headline text-3xl font-extrabold text-on-surface mb-3">
+            Atelier Capacity Exceeded
+          </h1>
+          <p className="text-sm text-slate-500 mb-8 leading-relaxed font-medium">
+            You have successfully curated 50 transactions on the free plan. Unlock unlimited workspace entries, AI receipt transcription, and predictive strategist insights with Pro Atelier.
+          </p>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Link
+              to="/membership"
+              className="btn-primary rounded-xl px-6 py-3.5 font-bold text-xs uppercase tracking-widest inline-flex items-center gap-2 shadow-emerald active:scale-95 transition-transform w-full sm:w-auto text-center justify-center"
+            >
+              Unlock Pro Access
+            </Link>
+            <Link
+              to="/expenses"
+              className="btn-secondary rounded-xl px-6 py-3.5 font-bold text-xs uppercase tracking-widest inline-flex items-center justify-center text-slate-500 hover:text-on-surface w-full sm:w-auto"
+            >
+              Back to Ledger
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }
@@ -372,53 +429,73 @@ const AddExpense = () => {
                 Receipt Attachment
               </label>
 
-              <div
-                onClick={() => fileRef.current?.click()}
-                className={`relative border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all ${
-                  receiptPreview
-                    ? 'border-primary/40 bg-mint-light'
-                    : 'border-slate-200 bg-slate-50 hover:border-primary/30 hover:bg-mint-light/30'
-                }`}
-                style={{ minHeight: '240px' }}
-              >
-                {receiptPreview ? (
-                  <img
-                    src={receiptPreview}
-                    alt="Receipt preview"
-                    className="w-full h-60 object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-                    <div className="w-12 h-12 bg-white rounded-xl shadow-card flex items-center justify-center">
-                      <span className="material-symbols-outlined text-xl text-slate-400">cloud_upload</span>
-                    </div>
-                    <p className="text-sm font-bold text-slate-500">Tap to upload receipt</p>
-                    <p className="text-[10px] text-slate-400 uppercase tracking-widest">JPG, PNG, PDF up to 5MB</p>
-                  </div>
-                )}
-
-                {/* Change button */}
-                {receiptPreview && (
-                  <div className="absolute bottom-3 right-3">
-                    <span className="bg-white/90 backdrop-blur rounded-lg px-3 py-1 text-xs font-bold text-slate-600 shadow-card">
-                      Change
+              {!isPro ? (
+                <div
+                  onClick={() => navigate('/membership')}
+                  className="relative border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden cursor-pointer bg-slate-50 hover:bg-slate-100/80 transition-all p-6 text-center flex flex-col items-center justify-center gap-3"
+                  style={{ minHeight: '240px' }}
+                >
+                  <div className="w-12 h-12 bg-white rounded-xl shadow-card flex items-center justify-center">
+                    <span className="material-symbols-outlined text-xl text-amber-500" style={{ fontVariationSettings: "'FILL' 1" }}>
+                      lock
                     </span>
                   </div>
-                )}
-              </div>
+                  <p className="text-sm font-bold text-slate-700">Receipt Attachment</p>
+                  <p className="text-[10px] text-slate-400 leading-normal max-w-[150px] mx-auto uppercase tracking-wider font-semibold">
+                    Upgrade to Pro to attach files &amp; receipts
+                  </p>
+                </div>
+              ) : (
+                <>
+                  <div
+                    onClick={() => fileRef.current?.click()}
+                    className={`relative border-2 border-dashed rounded-2xl overflow-hidden cursor-pointer transition-all ${
+                      receiptPreview
+                        ? 'border-primary/40 bg-mint-light'
+                        : 'border-slate-200 bg-slate-50 hover:border-primary/30 hover:bg-mint-light/30'
+                    }`}
+                    style={{ minHeight: '240px' }}
+                  >
+                    {receiptPreview ? (
+                      <img
+                        src={receiptPreview}
+                        alt="Receipt preview"
+                        className="w-full h-60 object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+                        <div className="w-12 h-12 bg-white rounded-xl shadow-card flex items-center justify-center">
+                          <span className="material-symbols-outlined text-xl text-slate-400">cloud_upload</span>
+                        </div>
+                        <p className="text-sm font-bold text-slate-500">Tap to upload receipt</p>
+                        <p className="text-[10px] text-slate-400 uppercase tracking-widest">JPG, PNG, PDF up to 5MB</p>
+                      </div>
+                    )}
 
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*,application/pdf"
-                onChange={handleFileChange}
-                className="hidden"
-              />
+                    {/* Change button */}
+                    {receiptPreview && (
+                      <div className="absolute bottom-3 right-3">
+                        <span className="bg-white/90 backdrop-blur rounded-lg px-3 py-1 text-xs font-bold text-slate-600 shadow-card">
+                          Change
+                        </span>
+                      </div>
+                    )}
+                  </div>
 
-              {receiptFile && (
-                <p className="text-xs text-slate-500 mt-2 truncate">
-                  📎 {receiptFile.name}
-                </p>
+                  <input
+                    ref={fileRef}
+                    type="file"
+                    accept="image/*,application/pdf"
+                    onChange={handleFileChange}
+                    className="hidden"
+                  />
+
+                  {receiptFile && (
+                    <p className="text-xs text-slate-500 mt-2 truncate">
+                      📎 {receiptFile.name}
+                    </p>
+                  )}
+                </>
               )}
             </div>
           </div>

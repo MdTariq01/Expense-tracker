@@ -15,13 +15,15 @@ const Dashboard = () => {
   const [expenses, setExpenses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [totalSpend, setTotalSpend] = useState(0);
+  const [monthlyIncome, setMonthlyIncome] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [summaryRes, expensesRes] = await Promise.all([
+        const [summaryRes, expensesRes, incomeSummaryRes] = await Promise.all([
           api.get('/expenses/summary'),
           api.get('/expenses?limit=5'),
+          api.get('/income/summary').catch(() => null),
         ]);
         
         // Extract summary array: { data: { summary: [...], totalSpend: ... } }
@@ -33,10 +35,17 @@ const Dashboard = () => {
         // Extract expenses array: { data: [...] }
         const expData = expensesRes.data?.data || expensesRes.data || [];
         setExpenses(Array.isArray(expData) ? expData.slice(0, 5) : (Array.isArray(expData?.expenses) ? expData.expenses.slice(0, 5) : []));
+
+        // Extract income summary
+        if (incomeSummaryRes) {
+          const incData = incomeSummaryRes.data?.data || incomeSummaryRes.data || {};
+          setMonthlyIncome(incData.totalIncomeThisMonth || 0);
+        }
       } catch {
         // Clear data on error (no more mock data)
         setSummary([]);
         setExpenses([]);
+        setMonthlyIncome(0);
       } finally {
         setLoading(false);
       }
@@ -54,8 +63,10 @@ const Dashboard = () => {
     })
     .reduce((acc, e) => acc + e.amount, 0);
 
-  const remainingBudget = (user?.monthlyIncome || 0) - spentThisMonth;
+  const baseIncome = monthlyIncome > 0 ? monthlyIncome : (user?.monthlyIncome || 0);
+  const remainingBudget = baseIncome - spentThisMonth;
   const budgetParts = remainingBudget.toFixed(2).split('.');
+  const savingsRate = baseIncome > 0 ? ((baseIncome - spentThisMonth) / baseIncome) * 100 : 0;
 
   const donutData = Array.isArray(summary) 
     ? summary.map((s) => ({
@@ -93,12 +104,25 @@ const Dashboard = () => {
               {user?.currency === 'INR' ? '₹' : '$'}{budgetParts[0]}
               <sup className="text-2xl font-semibold align-top ml-1 text-slate-400">.{budgetParts[1]}</sup>
             </div>
-            <div className="mt-6">
-              {totalBalance > 0 && (
-                <span className="px-3 py-1.5 bg-mint-light text-primary rounded-full text-xs font-bold inline-flex items-center gap-1">
-                  <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
-                  Active Ledger
-                </span>
+            
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4 border-t border-slate-100/50 pt-4">
+              <span className="px-3 py-1 bg-mint-light text-primary rounded-full text-[10px] font-black uppercase tracking-wider inline-flex items-center gap-1">
+                <span className="material-symbols-outlined text-[12px]" style={{ fontVariationSettings: "'FILL' 1" }}>trending_up</span>
+                Active Ledger
+              </span>
+              
+              {baseIncome > 0 && (
+                <div className="flex items-center gap-3 flex-1 max-w-[200px]">
+                  <div className="flex-1 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-500 ${savingsRate >= 20 ? 'bg-primary' : 'bg-amber-400'}`} 
+                      style={{ width: `${Math.min(100, Math.max(0, savingsRate))}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest whitespace-nowrap">
+                    Savings Rate: {savingsRate.toFixed(0)}%
+                  </span>
+                </div>
               )}
             </div>
           </div>

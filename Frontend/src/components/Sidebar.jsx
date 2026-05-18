@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 const navLinks = [
   { to: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
   { to: '/expenses', icon: 'receipt_long', label: 'Expenses' },
+  { to: '/income', icon: 'payments', label: 'Income' },
   { to: '/add-expense', icon: 'add_circle', label: 'Add Expense' },
   { to: '/insights', icon: 'insights', label: 'Insights' },
 ];

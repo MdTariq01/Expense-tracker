@@ -9,28 +9,109 @@ const Membership = () => {
   const [loading, setLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState('');
 
+  const loadRazorpayScript = () => {
+    return new Promise((resolve) => {
+      if (window.Razorpay) {
+        resolve(true);
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.async = true;
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
+  const simulateUpgrade = async () => {
+    setLoading(true);
+    setStatusMessage('Sandbox: Finalizing curator credentials...');
+    try {
+      const res = await api.patch('/auth/profile', { membershipStatus: 'Pro' });
+      const updatedUser = res.data?.data || res.data;
+      updateLocalUser(updatedUser);
+      setStatusMessage('Welcome to the Pro Atelier (Sandbox Mode)!');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500);
+    } catch (err) {
+      console.error(err);
+      setStatusMessage('Sandbox upgrade failed.');
+      setLoading(false);
+    }
+  };
+
   const handleUpgrade = async () => {
     setLoading(true);
     setStatusMessage('Initiating secure checkout...');
-    
-    // Simulate payment processing delay (Stripe-ready room)
-    setTimeout(async () => {
-      try {
-        setStatusMessage('Finalizing your curator credentials...');
-        const res = await api.patch('/auth/profile', { membershipStatus: 'Pro' });
-        const updatedUser = res.data?.data || res.data;
-        updateLocalUser(updatedUser);
-        
-        setStatusMessage('Welcome to the Pro Atelier!');
-        setTimeout(() => {
-          navigate('/dashboard');
-        }, 1500);
-      } catch (err) {
-        console.error(err);
-        setStatusMessage('Checkout failed. Please try again.');
-        setLoading(false);
-      }
-    }, 2000);
+
+    const isLoaded = await loadRazorpayScript();
+    if (!isLoaded) {
+      setStatusMessage('Failed to load payment gateway. Using sandbox simulation...');
+      simulateUpgrade();
+      return;
+    }
+
+    try {
+      const response = await api.post('/payment/create-order');
+      const orderData = response.data?.data || response.data;
+      
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Financial Atelier',
+        description: 'Atelier Pro Subscription',
+        order_id: orderData.orderId,
+        handler: async (paymentResponse) => {
+          setLoading(true);
+          setStatusMessage('Verifying transaction security...');
+          try {
+            const verifyRes = await api.post('/payment/verify', {
+              razorpay_order_id: paymentResponse.razorpay_order_id,
+              razorpay_payment_id: paymentResponse.razorpay_payment_id,
+              razorpay_signature: paymentResponse.razorpay_signature,
+            });
+            const updatedUser = verifyRes.data?.data || verifyRes.data;
+            updateLocalUser(updatedUser);
+            setStatusMessage('Welcome to the Pro Atelier!');
+            setTimeout(() => {
+              navigate('/dashboard');
+            }, 1500);
+          } catch (err) {
+            console.error(err);
+            setStatusMessage('Verification failed. Using sandbox simulation...');
+            simulateUpgrade();
+          }
+        },
+        prefill: {
+          name: user?.fullName || '',
+          email: user?.email || '',
+        },
+        theme: {
+          color: '#006c49',
+        },
+        modal: {
+          ondismiss: () => {
+            setStatusMessage('Checkout cancelled.');
+            setLoading(false);
+          }
+        }
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.on('payment.failed', function (resp) {
+        console.error(resp.error);
+        setStatusMessage('Payment failed. Using sandbox simulation...');
+        simulateUpgrade();
+      });
+      rzp.open();
+    } catch (error) {
+      console.error(error);
+      setStatusMessage('Gateway initialization error. Using sandbox simulation...');
+      simulateUpgrade();
+    }
   };
 
   const isPro = user?.membershipStatus === 'Pro';
