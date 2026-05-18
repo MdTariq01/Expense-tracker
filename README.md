@@ -361,12 +361,6 @@ VITE_API_URL
 
 ---
 
-## 📄 License
-
-This project is licensed under the ISC License - see the LICENSE file for details.
-
----
-
 ## 👨‍💻 Author
 
 **Mohammad Tariq**
@@ -387,7 +381,7 @@ This project is licensed under the ISC License - see the LICENSE file for detail
 For issues or questions:
 1. Check existing issues on GitHub
 2. Create a new issue with detailed description
-3. Contact: [Add contact info]
+3. Contact: officialmdtariq01@gmail.com
 
 ---
 
