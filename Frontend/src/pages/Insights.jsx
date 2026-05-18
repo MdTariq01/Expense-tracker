@@ -60,7 +60,7 @@ const Insights = () => {
           </p>
 
           <Link
-            to="/membership"
+            to="/upgrade"
             className="btn-primary rounded-2xl px-8 py-4 font-black text-xs uppercase tracking-widest inline-flex items-center gap-2 shadow-emerald active:scale-95 transition-transform"
           >
             <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>

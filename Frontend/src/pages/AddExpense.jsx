@@ -189,7 +189,7 @@ const AddExpense = () => {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              to="/membership"
+              to="/upgrade"
               className="btn-primary rounded-xl px-6 py-3.5 font-bold text-xs uppercase tracking-widest inline-flex items-center gap-2 shadow-emerald active:scale-95 transition-transform w-full sm:w-auto text-center justify-center"
             >
               Unlock Pro Access
@@ -431,7 +431,7 @@ const AddExpense = () => {
 
               {!isPro ? (
                 <div
-                  onClick={() => navigate('/membership')}
+                  onClick={() => navigate('/upgrade')}
                   className="relative border-2 border-dashed border-slate-200 rounded-2xl overflow-hidden cursor-pointer bg-slate-50 hover:bg-slate-100/80 transition-all p-6 text-center flex flex-col items-center justify-center gap-3"
                   style={{ minHeight: '240px' }}
                 >

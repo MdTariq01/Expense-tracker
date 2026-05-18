@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
@@ -40,22 +40,22 @@ const AppLayout = () => (
           { to: '/insights', icon: 'insights', label: 'Stats' },
         ].map((item) =>
           item.fab ? (
-            <a
+            <Link
               key={item.to}
-              href={item.to}
+              to={item.to}
               className="bg-primary text-white p-3.5 rounded-2xl -mt-10 shadow-emerald"
             >
               <span className="material-symbols-outlined text-2xl">{item.icon}</span>
-            </a>
+            </Link>
           ) : (
-            <a
+            <Link
               key={item.to}
-              href={item.to}
+              to={item.to}
               className="flex flex-col items-center text-slate-400"
             >
               <span className="material-symbols-outlined text-2xl">{item.icon}</span>
               <span className="text-[9px] font-bold uppercase tracking-widest mt-0.5">{item.label}</span>
-            </a>
+            </Link>
           )
         )}
       </nav>
