@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
@@ -172,15 +173,29 @@ const Profile = () => {
               accept="image/*"
             />
             
-            <h2 className="text-2xl font-black text-on-surface font-headline">{user?.name}</h2>
+            <h2 className="text-2xl font-black text-on-surface font-headline flex items-center justify-center gap-1.5">
+              {user?.name}
+              {user?.membershipStatus === 'Pro' && (
+                <span className="material-symbols-outlined text-amber-500 text-xl" style={{ fontVariationSettings: "'FILL' 1" }} title="Pro Member">
+                  workspace_premium
+                </span>
+              )}
+            </h2>
             <p className="text-sm text-slate-500 font-medium mb-8">{user?.email}</p>
 
             <div className="w-full pt-8 border-t border-slate-100 flex items-center justify-around">
                <div className="text-center">
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Status</p>
-                  <span className="px-3 py-1 bg-mint-light text-primary text-[10px] font-black uppercase rounded-full">
-                    {user?.membershipStatus || 'Active'}
-                  </span>
+                  {user?.membershipStatus === 'Pro' ? (
+                    <span className="px-3 py-1 bg-amber-500/10 text-amber-600 text-[10px] font-black uppercase rounded-full inline-flex items-center gap-1">
+                      <span className="material-symbols-outlined text-[10px]" style={{ fontVariationSettings: "'FILL' 1" }}>auto_awesome</span>
+                      Pro User
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-slate-100 text-slate-500 text-[10px] font-black uppercase rounded-full">
+                      Standard User
+                    </span>
+                  )}
                </div>
                <div className="text-center border-l border-slate-100 pl-8">
                   <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Currency</p>
@@ -211,6 +226,46 @@ const Profile = () => {
                     </div>
                   </div>
                </div>
+            </div>
+
+            {/* Membership Tier Card */}
+            <div className="card p-8 bg-gradient-to-br from-white to-slate-50/50 flex flex-col justify-between">
+              <div>
+                <h3 className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Membership Level</h3>
+                {user?.membershipStatus === 'Pro' ? (
+                  <div className="flex items-center gap-3">
+                    <div className="w-12 h-12 bg-amber-500/10 rounded-2xl flex items-center justify-center text-amber-600">
+                      <span className="material-symbols-outlined text-2xl" style={{ fontVariationSettings: "'FILL' 1" }}>
+                        workspace_premium
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-on-surface">Pro Atelier Member</p>
+                      <p className="text-[10px] text-slate-500 font-medium">Enjoying full premium access & intelligence insights.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-12 h-12 bg-slate-100 rounded-2xl flex items-center justify-center text-slate-400">
+                        <span className="material-symbols-outlined text-2xl">
+                          person
+                        </span>
+                      </div>
+                      <div>
+                        <p className="text-sm font-black text-on-surface">Standard Member</p>
+                        <p className="text-[10px] text-slate-500 font-medium">Basic personal finance tracking features.</p>
+                      </div>
+                    </div>
+                    <Link
+                      to="/upgrade"
+                      className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-[10px] uppercase tracking-wider transition-colors shadow-emerald flex-shrink-0"
+                    >
+                      Upgrade
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="card p-8 border-primary/10 bg-primary/5">

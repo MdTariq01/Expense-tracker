@@ -63,19 +63,21 @@ const Sidebar = () => {
       {/* Bottom Section */}
       <div className="mt-auto space-y-5">
         {/* Upgrade CTA */}
-        <div className="bg-gradient-to-br from-primary/30 to-primary-light/10 rounded-xl p-4 border border-primary-light/10">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="material-symbols-outlined text-primary-light text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
-              auto_awesome
-            </span>
-            <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Premium Access</p>
+        {user?.membershipStatus !== 'Pro' && (
+          <div className="bg-gradient-to-br from-primary/30 to-primary-light/10 rounded-xl p-4 border border-primary-light/10">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="material-symbols-outlined text-primary-light text-base" style={{ fontVariationSettings: "'FILL' 1" }}>
+                auto_awesome
+              </span>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Premium Access</p>
+            </div>
+            <Link to="/upgrade" className="block">
+              <button className="w-full py-2 px-3 bg-primary hover:bg-primary/80 text-white rounded-lg font-semibold text-xs transition-colors shadow-lg">
+                Upgrade to Pro
+              </button>
+            </Link>
           </div>
-          <Link to="/upgrade" className="block">
-            <button className="w-full py-2 px-3 bg-primary hover:bg-primary/80 text-white rounded-lg font-semibold text-xs transition-colors shadow-lg">
-              Upgrade to Pro
-            </button>
-          </Link>
-        </div>
+        )}
 
         {/* User Avatar */}
         <Link to="/profile" className="flex items-center gap-3 pt-4 border-t border-white/5 hover:bg-white/5 p-2 rounded-xl transition-colors group">
