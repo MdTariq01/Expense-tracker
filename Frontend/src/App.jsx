@@ -21,47 +21,107 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 
 // ── Protected layout wrapper (sidebar + navbar) ──────────────────────────────
-const AppLayout = () => (
-  <div className="flex min-h-screen bg-background">
-    <Sidebar />
-    <div className="flex-1 flex flex-col md:ml-56">
-      <Navbar />
-      <main className="flex-1">
-        <Outlet />
-      </main>
+const AppLayout = () => {
+  return (
+    <div className="flex min-h-screen bg-background">
+      
+      {/* Desktop Sidebar */}
+      <div className="hidden md:flex">
+        <Sidebar />
+      </div>
 
-      {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 backdrop-blur-xl flex items-center justify-around z-50 border-t border-slate-100 px-4">
-        {[
-          { to: '/dashboard', icon: 'dashboard', label: 'Home' },
-          { to: '/expenses', icon: 'receipt_long', label: 'Exp' },
-          { to: '/income', icon: 'payments', label: 'Inc' },
-          { to: '/add-expense', icon: 'add', label: '', fab: true },
-          { to: '/insights', icon: 'insights', label: 'Stats' },
-        ].map((item) =>
-          item.fab ? (
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col md:ml-56">
+
+        {/* Navbar */}
+        <Navbar />
+
+        {/* Page Content */}
+        <main className="flex-1">
+          <Outlet />
+        </main>
+
+        {/* Mobile Bottom Nav */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 z-50">
+          
+          <div className="grid grid-cols-5 items-center h-full max-w-md mx-auto">
+
+            {/* Dashboard */}
             <Link
-              key={item.to}
-              to={item.to}
-              className="bg-primary text-white p-3.5 rounded-2xl -mt-10 shadow-emerald"
+              to="/dashboard"
+              className="flex flex-col items-center justify-center text-slate-400"
             >
-              <span className="material-symbols-outlined text-2xl">{item.icon}</span>
+              <span className="material-symbols-outlined text-2xl">
+                dashboard
+              </span>
+
+              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
+                Home
+              </span>
             </Link>
-          ) : (
+
+            {/* Expenses */}
             <Link
-              key={item.to}
-              to={item.to}
-              className="flex flex-col items-center text-slate-400"
+              to="/expenses"
+              className="flex flex-col items-center justify-center text-slate-400"
             >
-              <span className="material-symbols-outlined text-2xl">{item.icon}</span>
-              <span className="text-[9px] font-bold uppercase tracking-widest mt-0.5">{item.label}</span>
+              <span className="material-symbols-outlined text-2xl">
+                receipt_long
+              </span>
+
+              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
+                Exp
+              </span>
             </Link>
-          )
-        )}
-      </nav>
+
+            {/* Add Button */}
+            <Link
+              to="/add-expense"
+              className="flex items-center justify-center"
+            >
+              <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg">
+                
+                <span className="material-symbols-outlined text-[28px]">
+                  add
+                </span>
+
+              </div>
+            </Link>
+
+            {/* Income */}
+            <Link
+              to="/income"
+              className="flex flex-col items-center justify-center text-slate-400"
+            >
+              <span className="material-symbols-outlined text-2xl">
+                payments
+              </span>
+
+              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
+                Inc
+              </span>
+            </Link>
+
+            {/* Insights */}
+            <Link
+              to="/insights"
+              className="flex flex-col items-center justify-center text-slate-400"
+            >
+              <span className="material-symbols-outlined text-2xl">
+                query_stats
+              </span>
+
+              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
+                Stats
+              </span>
+            </Link>
+
+          </div>
+        </nav>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 function App() {
   return (

@@ -130,7 +130,7 @@ const Membership = () => {
       </header>
 
       {/* Pricing Grid */}
-      <div className="grid md:grid-cols-2 gap-10 max-w-5xl mx-auto items-stretch px-4">
+      <div className="grid grid-cols-2 gap-4 gap-10 max-w-5xl mx-auto items-stretch px-4">
         {/* Free Plan */}
         <div className="card p-10 flex flex-col border border-slate-100 bg-white/50">
           <div className="mb-8">

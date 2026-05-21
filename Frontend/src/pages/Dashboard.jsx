@@ -79,7 +79,7 @@ const Dashboard = () => {
   const balanceParts = totalBalance.toFixed(2).split('.');
 
   return (
-    <div className="p-6 md:p-8 max-w-7xl mx-auto w-full space-y-8 fade-in">
+    <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 md:px-8 pt-6 pb-28 max-w-7xl mx-auto w-full space-y-8 fade-in">
       {/* Greeting */}
       <div>
         <h1 className="text-2xl font-black text-on-surface font-headline">
