@@ -703,6 +703,169 @@ const Income = () => {
           );
         })}
       </div>
+
+      {/* Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-end lg:items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl animate-in slide-in-from-bottom-5">
+            {/* Header */}
+            <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
+              <h2 className="text-lg font-black">
+                {editId ? 'Edit Income' : 'Add Income'}
+              </h2>
+              <button
+                onClick={() => setShowAddModal(false)}
+                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100"
+              >
+                <span className="material-symbols-outlined">close</span>
+              </button>
+            </div>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              {/* Error */}
+              {formError && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+                  {formError}
+                </div>
+              )}
+
+              {/* Title */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={formTitle}
+                  onChange={(e) => {
+                    setFormTitle(e.target.value);
+                    setFormError('');
+                  }}
+                  placeholder="e.g., Salary, Bonus, Gift"
+                  className="input-base w-full"
+                />
+              </div>
+
+              {/* Amount */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  value={formAmount}
+                  onChange={(e) => {
+                    setFormAmount(e.target.value);
+                    setFormError('');
+                  }}
+                  placeholder="0.00"
+                  className="input-base w-full"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                  Category
+                </label>
+                <select
+                  value={formCategory}
+                  onChange={(e) => setFormCategory(e.target.value)}
+                  className="input-base w-full"
+                >
+                  {INCOME_CATEGORIES.map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Date */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                  Date
+                </label>
+                <input
+                  type="date"
+                  value={formDate}
+                  onChange={(e) => setFormDate(e.target.value)}
+                  className="input-base w-full"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
+                  Description (Optional)
+                </label>
+                <textarea
+                  value={formDescription}
+                  onChange={(e) => setFormDescription(e.target.value)}
+                  placeholder="Add any notes..."
+                  rows={3}
+                  className="input-base w-full resize-none"
+                />
+              </div>
+
+              {/* Recurring */}
+              <div>
+                <label className="flex items-center gap-2 text-sm font-bold mb-3">
+                  <input
+                    type="checkbox"
+                    checked={formIsRecurring}
+                    onChange={(e) =>
+                      setFormIsRecurring(e.target.checked)
+                    }
+                    className="w-4 h-4 rounded border border-slate-300"
+                  />
+                  This is a recurring income
+                </label>
+
+                {formIsRecurring && (
+                  <select
+                    value={formFrequency}
+                    onChange={(e) =>
+                      setFormFrequency(e.target.value)
+                    }
+                    className="input-base w-full"
+                  >
+                    <option value="weekly">Weekly</option>
+                    <option value="biweekly">
+                      Bi-weekly
+                    </option>
+                    <option value="monthly">Monthly</option>
+                    <option value="quarterly">
+                      Quarterly
+                    </option>
+                    <option value="yearly">Yearly</option>
+                  </select>
+                )}
+              </div>
+
+              {/* Buttons */}
+              <div className="flex gap-3 pt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 px-4 py-3 border border-slate-200 rounded-xl font-bold text-sm hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold text-sm disabled:opacity-60"
+                >
+                  {submitting ? 'Saving...' : editId ? 'Update' : 'Add'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
