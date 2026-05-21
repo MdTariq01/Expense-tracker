@@ -706,165 +706,245 @@ const Income = () => {
 
       {/* Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-end lg:items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-xl animate-in slide-in-from-bottom-5">
-            {/* Header */}
-            <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between">
-              <h2 className="text-lg font-black">
-                {editId ? 'Edit Income' : 'Add Income'}
-              </h2>
-              <button
-                onClick={() => setShowAddModal(false)}
-                className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-slate-100"
-              >
-                <span className="material-symbols-outlined">close</span>
-              </button>
-            </div>
+  <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-end lg:items-center justify-center">
 
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              {/* Error */}
-              {formError && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                  {formError}
-                </div>
-              )}
+    {/* Modal */}
+    <div className="relative w-full lg:max-w-lg bg-white rounded-t-[2rem] lg:rounded-[2rem] shadow-2xl animate-in slide-in-from-bottom-5 max-h-[92vh] flex flex-col overflow-hidden">
 
-              {/* Title */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  value={formTitle}
-                  onChange={(e) => {
-                    setFormTitle(e.target.value);
-                    setFormError('');
-                  }}
-                  placeholder="e.g., Salary, Bonus, Gift"
-                  className="input-base w-full"
-                />
-              </div>
+      {/* Header */}
+      <div className="sticky top-0 z-10 bg-white border-b border-slate-100 px-5 py-4 flex items-center justify-between">
 
-              {/* Amount */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                  Amount
-                </label>
-                <input
-                  type="number"
-                  step="0.01"
-                  value={formAmount}
-                  onChange={(e) => {
-                    setFormAmount(e.target.value);
-                    setFormError('');
-                  }}
-                  placeholder="0.00"
-                  className="input-base w-full"
-                />
-              </div>
+        <div>
+          <h2 className="text-lg font-black text-on-surface">
+            {editId ? 'Edit Income' : 'Add Income'}
+          </h2>
 
-              {/* Category */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                  Category
-                </label>
-                <select
-                  value={formCategory}
-                  onChange={(e) => setFormCategory(e.target.value)}
-                  className="input-base w-full"
-                >
-                  {INCOME_CATEGORIES.map((c) => (
-                    <option key={c} value={c}>
-                      {c}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Date */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                  Date
-                </label>
-                <input
-                  type="date"
-                  value={formDate}
-                  onChange={(e) => setFormDate(e.target.value)}
-                  className="input-base w-full"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">
-                  Description (Optional)
-                </label>
-                <textarea
-                  value={formDescription}
-                  onChange={(e) => setFormDescription(e.target.value)}
-                  placeholder="Add any notes..."
-                  rows={3}
-                  className="input-base w-full resize-none"
-                />
-              </div>
-
-              {/* Recurring */}
-              <div>
-                <label className="flex items-center gap-2 text-sm font-bold mb-3">
-                  <input
-                    type="checkbox"
-                    checked={formIsRecurring}
-                    onChange={(e) =>
-                      setFormIsRecurring(e.target.checked)
-                    }
-                    className="w-4 h-4 rounded border border-slate-300"
-                  />
-                  This is a recurring income
-                </label>
-
-                {formIsRecurring && (
-                  <select
-                    value={formFrequency}
-                    onChange={(e) =>
-                      setFormFrequency(e.target.value)
-                    }
-                    className="input-base w-full"
-                  >
-                    <option value="weekly">Weekly</option>
-                    <option value="biweekly">
-                      Bi-weekly
-                    </option>
-                    <option value="monthly">Monthly</option>
-                    <option value="quarterly">
-                      Quarterly
-                    </option>
-                    <option value="yearly">Yearly</option>
-                  </select>
-                )}
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowAddModal(false)}
-                  className="flex-1 px-4 py-3 border border-slate-200 rounded-xl font-bold text-sm hover:bg-slate-50"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="flex-1 px-4 py-3 bg-primary text-white rounded-xl font-bold text-sm disabled:opacity-60"
-                >
-                  {submitting ? 'Saving...' : editId ? 'Update' : 'Add'}
-                </button>
-              </div>
-            </form>
-          </div>
+          <p className="text-xs text-slate-400 mt-0.5">
+            Manage your income stream
+          </p>
         </div>
+
+        <button
+          onClick={() => setShowAddModal(false)}
+          className="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center"
+        >
+          <span className="material-symbols-outlined text-slate-700">
+            close
+          </span>
+        </button>
+      </div>
+
+      {/* Scroll Area */}
+      <div className="flex-1 overflow-y-auto px-5 py-5 pb-40">
+
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5"
+        >
+
+          {/* Error */}
+          {formError && (
+            <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-red-700 text-sm font-medium">
+              {formError}
+            </div>
+          )}
+
+          {/* Title */}
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 mb-2">
+              Income Title
+            </label>
+
+            <input
+              type="text"
+              value={formTitle}
+              onChange={(e) => {
+                setFormTitle(e.target.value);
+                setFormError('');
+              }}
+              placeholder="Salary, Bonus, Freelance..."
+              className="input-base w-full py-3.5 rounded-2xl"
+            />
+          </div>
+
+          {/* Amount */}
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 mb-2">
+              Amount
+            </label>
+
+            <div className="relative">
+
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+                $
+              </span>
+
+              <input
+                type="number"
+                step="0.01"
+                value={formAmount}
+                onChange={(e) => {
+                  setFormAmount(e.target.value);
+                  setFormError('');
+                }}
+                placeholder="0.00"
+                className="input-base w-full py-3.5 pl-8 rounded-2xl"
+              />
+            </div>
+          </div>
+
+          {/* Category */}
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 mb-2">
+              Category
+            </label>
+
+            <select
+              value={formCategory}
+              onChange={(e) =>
+                setFormCategory(e.target.value)
+              }
+              className="input-base w-full py-3.5 rounded-2xl"
+            >
+              {INCOME_CATEGORIES.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Date */}
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 mb-2">
+              Date
+            </label>
+
+            <input
+              type="date"
+              value={formDate}
+              onChange={(e) =>
+                setFormDate(e.target.value)
+              }
+              className="input-base w-full py-3.5 rounded-2xl"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-[10px] font-black uppercase tracking-[0.18em] text-slate-400 mb-2">
+              Notes
+            </label>
+
+            <textarea
+              value={formDescription}
+              onChange={(e) =>
+                setFormDescription(
+                  e.target.value
+                )
+              }
+              placeholder="Optional details..."
+              rows={4}
+              className="input-base w-full resize-none rounded-2xl"
+            />
+          </div>
+
+          {/* Recurring */}
+          <div className="bg-slate-50 rounded-2xl p-4">
+
+            <label className="flex items-center gap-3">
+
+              <input
+                type="checkbox"
+                checked={formIsRecurring}
+                onChange={(e) =>
+                  setFormIsRecurring(
+                    e.target.checked
+                  )
+                }
+                className="w-5 h-5 rounded border border-slate-300"
+              />
+
+              <div>
+                <p className="text-sm font-bold text-on-surface">
+                  Recurring Income
+                </p>
+
+                <p className="text-xs text-slate-400">
+                  Automatically track repeating payments
+                </p>
+              </div>
+
+            </label>
+
+            {formIsRecurring && (
+              <select
+                value={formFrequency}
+                onChange={(e) =>
+                  setFormFrequency(
+                    e.target.value
+                  )
+                }
+                className="input-base w-full mt-4 py-3 rounded-2xl"
+              >
+                <option value="weekly">
+                  Weekly
+                </option>
+
+                <option value="biweekly">
+                  Bi-weekly
+                </option>
+
+                <option value="monthly">
+                  Monthly
+                </option>
+
+                <option value="quarterly">
+                  Quarterly
+                </option>
+
+                <option value="yearly">
+                  Yearly
+                </option>
+              </select>
+            )}
+          </div>
+
+        </form>
+      </div>
+
+      {/* Sticky Bottom Buttons */}
+      <div className="sticky bottom-0 bg-white border-t border-slate-100 p-5 pb-8">
+
+        <div className="flex gap-3">
+
+          <button
+            type="button"
+            onClick={() =>
+              setShowAddModal(false)
+            }
+            className="flex-1 h-14 rounded-2xl border border-slate-200 text-sm font-black text-slate-600"
+          >
+            Cancel
+          </button>
+
+          <button
+            type="submit"
+            onClick={handleSubmit}
+            disabled={submitting}
+            className="flex-1 h-14 rounded-2xl bg-primary text-white text-sm font-black disabled:opacity-60 shadow-emerald"
+          >
+            {submitting
+              ? 'Saving...'
+              : editId
+              ? 'Update Income'
+              : 'Add Income'}
+          </button>
+
+        </div>
+      </div>
+    </div>
+  </div>
       )}
     </div>
   );
