@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, Outlet, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, Link, NavLink } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Sidebar from './components/Sidebar';
@@ -41,82 +41,108 @@ const AppLayout = () => {
           <Outlet />
         </main>
 
-        {/* Mobile Bottom Nav */}
-        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white border-t border-slate-200 z-50">
-          
-          <div className="grid grid-cols-5 items-center h-full max-w-md mx-auto">
+        {/* Mobile bottom nav */}
+        <nav className="md:hidden fixed bottom-0 left-0 right-0 h-20 bg-white/95 backdrop-blur-xl flex items-center justify-around z-50 border-t border-slate-100 px-2 shadow-[0_-5px_30px_rgba(0,0,0,0.04)]">
 
-            {/* Dashboard */}
-            <Link
-              to="/dashboard"
-              className="flex flex-col items-center justify-center text-slate-400"
-            >
-              <span className="material-symbols-outlined text-2xl">
-                dashboard
-              </span>
+          {[
+            {
+              to: '/dashboard',
+              icon: 'dashboard',
+              label: 'Home',
+            },
 
-              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
-                Home
-              </span>
-            </Link>
+            {
+              to: '/expenses',
+              icon: 'receipt_long',
+              label: 'Exp',
+            },
 
-            {/* Expenses */}
-            <Link
-              to="/expenses"
-              className="flex flex-col items-center justify-center text-slate-400"
-            >
-              <span className="material-symbols-outlined text-2xl">
-                receipt_long
-              </span>
+            {
+              to: '/add-expense',
+              icon: 'add',
+              label: '',
+              fab: true,
+            },
 
-              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
-                Exp
-              </span>
-            </Link>
+            {
+              to: '/income',
+              icon: 'payments',
+              label: 'Inc',
+            },
 
-            {/* Add Button */}
-            <Link
-              to="/add-expense"
-              className="flex items-center justify-center"
-            >
-              <div className="w-14 h-14 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg">
-                
-                <span className="material-symbols-outlined text-[28px]">
-                  add
+            {
+              to: '/insights',
+              icon: 'insights',
+              label: 'Stats',
+            },
+          ].map((item) =>
+            item.fab ? (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `relative flex items-center justify-center w-16 h-16 rounded-3xl transition-all duration-300 ${
+                    isActive
+                      ? 'bg-primary scale-110 shadow-emerald'
+                      : 'bg-primary'
+                  }`
+                }
+              >
+                <span className="material-symbols-outlined text-white text-3xl">
+                  {item.icon}
                 </span>
+              </NavLink>
+            ) : (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className={({ isActive }) =>
+                  `flex flex-col items-center justify-center gap-1 transition-all duration-300 min-w-[60px] ${
+                    isActive
+                      ? 'text-primary'
+                      : 'text-slate-400'
+                  }`
+                }
+              >
+                {({ isActive }) => (
+                  <>
+                    <div
+                      className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all duration-300 ${
+                        isActive
+                          ? 'bg-primary/10'
+                          : 'bg-transparent'
+                      }`}
+                    >
+                      <span
+                        className={`material-symbols-outlined text-[24px] ${
+                          isActive
+                            ? 'text-primary'
+                            : 'text-slate-400'
+                        }`}
+                        style={{
+                          fontVariationSettings: isActive
+                            ? "'FILL' 1"
+                            : "'FILL' 0",
+                        }}
+                      >
+                        {item.icon}
+                      </span>
+                    </div>
 
-              </div>
-            </Link>
-
-            {/* Income */}
-            <Link
-              to="/income"
-              className="flex flex-col items-center justify-center text-slate-400"
-            >
-              <span className="material-symbols-outlined text-2xl">
-                payments
-              </span>
-
-              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
-                Inc
-              </span>
-            </Link>
-
-            {/* Insights */}
-            <Link
-              to="/insights"
-              className="flex flex-col items-center justify-center text-slate-400"
-            >
-              <span className="material-symbols-outlined text-2xl">
-                query_stats
-              </span>
-
-              <span className="text-[10px] font-bold uppercase tracking-widest mt-1">
-                Stats
-              </span>
-            </Link>
-
-          </div>
+                    <span
+                      className={`text-[10px] font-black uppercase tracking-[0.18em] ${
+                        isActive
+                          ? 'text-primary'
+                          : 'text-slate-400'
+                      }`}
+                    >
+                      {item.label}
+                    </span>
+                  </>
+                )}
+              </NavLink>
+            )
+          )}
         </nav>
       </div>
     </div>
